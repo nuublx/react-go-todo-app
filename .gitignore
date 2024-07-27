@@ -1,0 +1,22 @@
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# React
+/node_modules
+/build
+/.env
+# IDE/Editor
+.vscode/
+.idea/
+*.code-workspace
+
+# Logs and temporary files
+/tmp
+*.log
+*.tmp
+*.swp
+.DS_Store

@@ -1,0 +1,13 @@
+# air.toml
+
+# Specify the directory to watch for changes
+root = "./"
+
+# Specify the file extensions to watch for changes
+include_ext = ["go"]
+
+# Specify the directories to exclude from watching
+exclude_dir = ["vendor", "node_modules", "client", "tmp"]
+
+# Specify the command to run when changes are detected
+command = "go run main.go"
