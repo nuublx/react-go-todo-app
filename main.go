@@ -8,8 +8,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/nuublx/react-go-todo-app/pkg/routers"
+	mongodb "github.com/nuublx/react-go-todo-app/platform/mongo"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var todosCollection *mongo.Collection
@@ -18,27 +19,15 @@ func main() {
 	fmt.Println("welcome to my to-do app")
 
 	app := fiber.New()
-
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("error: %s", err.Error()))
 	}
-	Routers(app)
+	routers.TodoRouters(app)
+	routers.UsersRouters(app)
+	mongodb.OpenMongoConnection()
 
-	dbURI := os.Getenv("MONGO_DB_URI")
-	clientOptions := options.Client().ApplyURI(dbURI)
-	client, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer client.Disconnect(context.Background())
-
-	err = client.Ping(context.Background(), nil)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	todosCollection = client.Database("todo-database").Collection("todos")
+	defer mongodb.Client.Disconnect(context.Background())
 
 	PORT := os.Getenv("PORT")
 	fmt.Printf("now listening on port: %s", PORT)

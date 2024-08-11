@@ -1,4 +1,4 @@
-package main
+package controllers
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	mongodb "github.com/nuublx/react-go-todo-app/platform/mongo"
 	types "github.com/nuublx/react-go-todo-app/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,7 +16,7 @@ import (
 func GetAllTodos(c *fiber.Ctx) error {
 	var todos []types.Todo
 	var err error
-	todosCursor, err := todosCollection.Find(context.Background(), bson.M{})
+	todosCursor, err := mongodb.TodosCollection.Find(context.Background(), bson.M{})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": true, "msg": err.Error()})
 	}
@@ -55,7 +56,7 @@ func CreateTodo(c *fiber.Ctx) error {
 		UpdatedAt:   time.Now(),
 	}
 
-	result, err = todosCollection.InsertOne(context.Background(), newTodo)
+	result, err = mongodb.TodosCollection.InsertOne(context.Background(), newTodo)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{})
 	}
@@ -78,7 +79,7 @@ func UpdateDescription(c *fiber.Ctx) error {
 	update := bson.M{"$set": bson.M{"description": updateTodoModel.Description, "updatedAt": time.Now()}}
 
 	var updatedTodo types.Todo
-	err = todosCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectId}, update).Decode(&updatedTodo)
+	err = mongodb.TodosCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectId}, update).Decode(&updatedTodo)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": true, "msg": err.Error()})
 	}
@@ -95,7 +96,7 @@ func MarkTodoCompleted(c *fiber.Ctx) error {
 	update := bson.M{"$set": bson.M{"completed": true, "updatedAt": time.Now()}}
 
 	var todo types.Todo
-	err = todosCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectId}, update).Decode(&todo)
+	err = mongodb.TodosCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectId}, update).Decode(&todo)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -113,7 +114,7 @@ func MarkTodoPending(c *fiber.Ctx) error {
 	update := bson.M{"$set": bson.M{"completed": false, "updatedAt": time.Now()}}
 
 	var todo types.Todo
-	err = todosCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectId}, update).Decode(&todo)
+	err = mongodb.TodosCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectId}, update).Decode(&todo)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -129,7 +130,7 @@ func DeleteTodo(c *fiber.Ctx) error {
 	}
 
 	var todo types.Todo
-	err = todosCollection.FindOneAndDelete(context.Background(), bson.M{"_id": objectId}).Decode(&todo)
+	err = mongodb.TodosCollection.FindOneAndDelete(context.Background(), bson.M{"_id": objectId}).Decode(&todo)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": true, "msg": err.Error()})
 	}
